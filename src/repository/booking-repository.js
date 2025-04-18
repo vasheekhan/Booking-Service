@@ -30,5 +30,32 @@ async update(bookingId,data){
         throw new AppError("RepositoryError","cannot update the  Booking","there was some issiue in updating  the booking please try again later",StatusCodes.INTERNAL_SERVER_ERROR)
     }
     }
+    async destroy(bookingId){
+        try {
+            const response=await Booking.destroy({
+                where:{
+                    id:bookingId
+                }
+            })
+            return true;
+        } catch (error) {
+            if(error.name="SequelizeValidationError"){
+                throw new ValidationError(error);
+            }
+            throw new AppError("RepositoryError","cannot update the  Booking","there was some issiue in updating  the booking please try again later",StatusCodes.INTERNAL_SERVER_ERROR)  
+        }
+    }
+    async find(bookingId){
+    try{    const booking =await Booking.findByPk(bookingId);
+        return booking;}catch(error){
+            if(error.name="SequelizeValidationError"){
+                throw new ValidationError(error);
+            }
+            throw new AppError("RepositoryError","cannot update the  Booking","there was some issiue in updating  the booking please try again later",StatusCodes.INTERNAL_SERVER_ERROR)  
+        }
+    }
 }
+
+
+
 module.exports=BookingRepository;

@@ -44,6 +44,54 @@ class BookingService {
       );
     }
   }
+  async destroyBooking(bookingId) {
+    try {
+      const bookingData = await this.BookingRepository.find(bookingId);
+      // console.log("bookingData", bookingData);
+  
+      const { flightId, noOfSeats } = bookingData.dataValues;
+      // console.log("flightId","noOfSeats",flightId,noOfSeats);
+  
+      const getFlightRequestUrl = `${FLIGHT_SERVICE_PATH}/api/v1/getflight/${flightId}`;
+      // console.log("getflightrequesturl",getFlightRequestUrl);
+      const flightResponse = await axios.get(getFlightRequestUrl);
+      console.log("flightresponsee",flightResponse.data);
+      const currentSeats = flightResponse.data.data.totalSeats;
+  
+      const response = await this.BookingRepository.destroy(bookingId);
+  
+      const updateFlightRequestURL = `${FLIGHT_SERVICE_PATH}/api/v1/flights/${flightId}`;
+      await axios.patch(updateFlightRequestURL, {
+        totalSeats: currentSeats + noOfSeats
+      });
+  
+      return response;
+    } catch (error) {
+      console.log("Error in destroyBooking:", error.message || error);
+      throw error;
+    }
+  }
+  async cancelBooking(bookingId){
+    try {
+      const bookingData = await this.BookingRepository.find(bookingId);
+      const { flightId, noOfSeats } = bookingData.dataValues;
+     const getFlightRequestUrl = `${FLIGHT_SERVICE_PATH}/api/v1/getflight/${flightId}`;
+      const flightResponse = await axios.get(getFlightRequestUrl);
+      const currentSeats = flightResponse.data.data.totalSeats;
+  
+      const response = await this.BookingRepository.update(bookingId,{status:"cancelled"});
+   const updateFlightRequestURL = `${FLIGHT_SERVICE_PATH}/api/v1/flights/${flightId}`;
+      await axios.patch(updateFlightRequestURL, {
+        totalSeats: currentSeats + noOfSeats
+      });
+  
+      return response;
+    } catch (error) {
+      console.log("Error in destroyBooking:", error.message || error);
+      throw error;
+    }
+  }
+  
 }
 
 module.exports = BookingService;
