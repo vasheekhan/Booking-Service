@@ -1,8 +1,11 @@
 const express=require("express");
 const { BookingControllers } = require("../../controllers/index");
 const router=express.Router();
-console.log("hey");
-router.post("/bookings",BookingControllers.create);
-router.delete("/bookings/:id",BookingControllers.destroy);
-router.patch("/bookings/:id",BookingControllers.cancelBooking)
+const bookingControllers=new BookingControllers();
+
+
+router.post("/bookings",bookingControllers.create);
+router.post("/publish",bookingControllers.sendMessageToQueue);
+router.delete("/bookings/:id",bookingControllers.destroy);
+router.patch("/bookings/:id",bookingControllers.cancelBooking)
 module.exports=router;
